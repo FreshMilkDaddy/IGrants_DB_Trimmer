@@ -1,7 +1,8 @@
 # Originally created: 2016.09.01
 # This script removes MOST non-international grants from the grants.gov downloadable
-# XML database, reformats due dates & currency for easier readability, and removes
-# garbage opps., i.e., the "this is a test, do not apply" opps.
+#   XML database, reformats due dates & currency for easier readability, removes
+#   garbage opps., i.e., the "this is a test, do not apply" opps, and adds hyperlinks
+#   to the OppNums for use in the HTML table on the USA grants website.
 # Updated for GdG v2.0 XML on 2017.01.02
 
 import datetime
@@ -16,7 +17,7 @@ __copyright__ = 'Copyright 2016, J.M.Sanderson - The iGrants Project'
 __email__ = 'j-sanderson@jimu.kumamoto-u.ac.jp'
 __license__ = 'GPL'
 
-# for time measurements #
+# See how much time this shit takes to run. (End @ bottom) #
 start = time.time()
 
 parser = etree.XMLParser(ns_clean=True)
@@ -87,10 +88,8 @@ for oppSyn in root.findall('{*}OpportunitySynopsisDetail_1_0'):
 
 # print('Run time was about', round(end-start, 2), 'seconds.')
 
-# TESTING #  **Working well but could use a little more fine tuning.**
-
 # There seems to be no standard way of declaring foreign eligibility.
-# This won't catch all non-int'l-eligible grants but it cuts the list by ~1/3.
+# This won't catch all non-int'l-eligible grants but it cuts the grant list by ~1/3.
 # Of particular problem are opps that don't use the word "foreign" at all.
 
 # Remove all opps with certain wording about ineligibility in the
@@ -129,7 +128,12 @@ for oppSyn in root.findall('{*}OpportunitySynopsisDetail_1_0'):
         if re.search(r"(?=.*\beligible applicants are limited).*$", str(otherCat.text), flags=re.I):
             root.remove(oppSyn)
 
-# END TESTING #
+#Add HTML link to grants.gov oppIDs
+oppIDs = [t.text for t in root.findall('.//{*}OpportunityID')]
+oppNus = [t.text for t in root.findall('.//{*}OpportunityNumber')]
+
+for idx, oppN in enumerate(root.findall('.//{*}OpportunityNumber')):
+    oppN.text = '<a href="https://www.grants.gov/view-opportunity.html?oppId={0}" target="_blank">{1}</a>'.format(oppIDs[idx], oppNus[idx])
 
 # For USA.htm database -> contains unrestricted (99s) and filtered other (25s)
 tree.write('Output/IGrants-DB-v2.xml', xml_declaration=True, encoding='UTF-8', method='xml')
