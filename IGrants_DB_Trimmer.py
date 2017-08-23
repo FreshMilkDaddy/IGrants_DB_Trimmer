@@ -1,15 +1,13 @@
+## 2016.02.01
+## This script removes all non-international grants from the grants.gov downloadable XML database,
+## reformats due dates & currency for easier readability, and removes garbage opps., i.e., the "this is a test, do not apply" opps.
+
 __author__ = 'J.Sanderson'
 __copyright__='Copyright 2016, J.Sanderson - The IGrants Project'
 __email__='j-sanderson@jimu.kumamoto-u.ac.jp'
 __license__='GPL'
-# finished adding the following on 2015.21.12:
-# remove opps up to current date, not just year & sort by due dates
-# reformat dates to and easier-to-read format (E.g., dd-mm-yyyy)
-# format currency to easier-to-read format (E.g., ###,###,### - will note 'USD' in web table header)
-# removed garbage opps, i.e., the "this is a test, do not apply" opps.
 
 import datetime, re, xml.etree.cElementTree as cElmTree
-# import locale ##not needed now
 tree = cElmTree.parse('Database/GrantsDBExtract.xml')
 root = tree.getroot()
 
@@ -17,14 +15,11 @@ root = tree.getroot()
 # we don't care about the difference, & merging makes processing easier.
 for element in root.findall('FundingOppModSynopsis'):
     element.tag = 'FundingOppSynopsis'
-	
-# NEW: (28.11.2015): added category number 25 "other" to list --> only SOME are int'l
-# ^is this a good idea?? --> how many 25s are international?? 
-# (category 25s increase fund count by factor of 2-ish)
-# OLD: remove all non international grants
+    
+# Reverting back to only using category 99 (from version 4). Cat. 25 contains too many non-int'l grants.
 for FundingOppSynopsis in root.findall('FundingOppSynopsis'):
     IDs = [int(category.text) for category in FundingOppSynopsis.findall('EligibilityCategory')]
-    if 99 not in IDs and 25 not in IDs:      # if 99 not in IDs:  ##old
+    if 99 not in IDs:
         root.remove(FundingOppSynopsis)
 
 # remove all grants older than the day of full XML DB processing
@@ -62,16 +57,16 @@ for FundingOppSynopsis in root.findall('FundingOppSynopsis'):
 # remove the "test - don't apply" opps
 for FundingOppSynopsis in root.findall('FundingOppSynopsis'):
     for title in FundingOppSynopsis.findall('FundingOppTitle'):
-        if re.match("This is a test", title.text): #and re.match("do not submit", tstOpps):  #not needed??#
+        if re.match("This is a test", title.text): 
             root.remove(FundingOppSynopsis)
 
-tree.write('Output/IGrants.xml', xml_declaration=True, encoding='UTF-8', method='xml')
+tree.write('Output/IGrants-DB.xml', xml_declaration=True, encoding='UTF-8', method='xml')
 
 # Append required header text.
 import fileinput
 processing_lineOne = False
 
-for line in fileinput.input('Output/IGrants.xml', inplace=1):
+for line in fileinput.input('Output/IGrants-DB.xml', inplace=1):
     if line.startswith('<?xml version'):
         processing_lineOne = True
     else:
@@ -83,13 +78,10 @@ for line in fileinput.input('Output/IGrants.xml', inplace=1):
 
 print('~' * 80)
 print('DONE! This script removed the following from the NIH grants database:')
-print('--> MOST* non-international funding opportunities.')
+print('--> All non-international funding opportunities.')
 print('--> Funding opportunities that expired before today,', datetime.datetime.now().date())
 print('--> Garbage opportunities with titles such as "This is a test...do not apply".')
 print('This script also formated the date & award ceiling strings for readability.')
 print('*****')
-print('--> *The Grants.Gov eligibility category of "Unrestricted" is international,')
-print('-->  however, the "Other" category contains only some international opps.')
-print('-->  Users or URAs should check the availablility of an opportunity of interest!')
-print('Please place the "IGrants.xml" output file into the appropriate URA_Web folder.')
+print('Please place the "IGrants-DB.xml" output file into the appropriate URA_Web folder.')
 print('~' * 80)
