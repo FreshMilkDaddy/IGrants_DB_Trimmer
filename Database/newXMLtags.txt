@@ -1,0 +1,9 @@
+New XML tags
+
+FundingInstrumentType
+OpportunityTitle
+CloseDate
+AwardCeiling
+OpportunityNumber
+
+EligibleApplicants

@@ -1,0 +1,4 @@
+New DB resources:
+
+http://apply07.grants.gov/apply/system/schemas/OpportunityDetail-V1.0.xsd
+
