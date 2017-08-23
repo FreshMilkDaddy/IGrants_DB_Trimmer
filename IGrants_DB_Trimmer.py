@@ -3,7 +3,7 @@
 #   XML database, reformats due dates & currency for easier readability, removes
 #   garbage opps., i.e., the "this is a test, do not apply" opps, and adds hyperlinks
 #   to the OppNums for use in the HTML table on the USA grants website.
-# Updated for GdG v2.0 XML on 2017.01.02
+# Updated for GdG v2.0 XML on 2017.01.02 (2017.08.23 - now on git)
 
 import datetime
 import fileinput
