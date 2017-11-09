@@ -1,8 +1,10 @@
 # Originally created: 2016.09.01
 # This script removes MOST non-international grants from the grants.gov downloadable
 #   XML database, reformats due dates & currency for easier readability, removes
-#   garbage opps., i.e., the "this is a test, do not apply" opps, and adds hyperlinks
-#   to the OppNums for use in the HTML table on the USA grants website.
+#   garbage opps., i.e., the "this is a test, do not apply" opps, adds hyperlinks
+#   to the OppNums for use in the HTML table on the USA grants website, and removes
+#   grants from agencies that either do not agree with KU policy (DOD) or do not usually
+#   offer funding to international applicants (DOT).
 # Updated for GdG v2.0 XML on 2017.01.02
 
 import datetime
@@ -21,7 +23,8 @@ __license__ = 'GPL'
 start = time.time()
 
 parser = etree.XMLParser(ns_clean=True)
-tree = etree.parse('Database/GrantsDBExtractv2.xml', parser)
+tree = etree.parse('Data/GrantsDBExtractv2.xml', parser)  #original: restore after testing
+#tree = etree.parse('Data/GrantsDBExtractv2-TESTFILE.xml', parser)  #test: should usually be commented out
 root = tree.getroot()
 ns = etree.QName(root, "html")  # namespace (use "ns.namespace")
 # Use '{*}whateverthehell' for most namespace access##
@@ -30,11 +33,24 @@ ns = etree.QName(root, "html")  # namespace (use "ns.namespace")
 for el in root.findall('{*}OpportunityForecastDetail_1_0'):
     el.tag = "{%s}OpportunitySynopsisDetail_1_0" % ns.namespace
 
-# remove all grants older than the day of full XML DB processing
+# remove all grants older than the day of XML DB processing
 for el in root.findall('{*}OpportunitySynopsisDetail_1_0'):
     dDate = [datetime.datetime.strptime(dD.text, '%m%d%Y') for dD in el.findall('{*}CloseDate')]
     if dDate < [datetime.datetime.now()]:
         root.remove(el)
+
+# remove all DOD, DOI, VA, DOT, DOS, DOL agency entries
+for el in root.findall('{*}OpportunitySynopsisDetail_1_0'):
+    for agency in el.findall('{*}AgencyCode'):
+        if agency.text[:3] == "DOD" or agency.text[:3] == "DOI" or agency.text[:2] == "VA" or agency.text[:3] == "DOT" or agency.text[:3] == "DOS" or agency.text[:3] == "DOL":
+            root.remove(el)
+
+# other possible agencies to remove: GCERC, DOE, USAID, NARA, IMLS
+
+# why doesn't this work like the above?
+#for el in root.findall('.//{*}AgencyCode'):
+#    if el.text[:3] == "DOD":
+#        root.remove(el)
 
 # NOTE: not all 25s are international
 for el in root.findall('{*}OpportunitySynopsisDetail_1_0'):
@@ -194,12 +210,13 @@ print('~' * 80)
 print('DONE! Run time was approximately', round(end - start, 2), 'seconds.')
 print('This script removed the following from the grants.gov database:')
 print('--> All non-international funding opportunities for the iGrants Google calendar.')
-print('--> Most non-international funding opportunities for the USA web page grants datatable.')
+print('--> Most non-international funding opportunities for the USA grants web page')
 print('--> Funding opportunities that expired before today.')
+print('--> Opportunities from the DOD, DOI, VA, DOT, DOS, & DOL.')
 print('--> Garbage opportunities with titles such as "This is a test...do not apply".')
-print('This script also formated the date & award ceiling strings for readability.')
-print('***     ***** TO USE *****     ***')
+print('This script also formated the date & award ceiling strings for readability.\n')
+print('               ***     ***** TO USE *****     ***\n')
 print('Place the "IGrants-DB-v2.xml" output file into the appropriate URA_Web folder.')
-print('Upload the "IGrants-Cal-v2.csv" output file to the iGrants (USA) Google calendar.')
+print('Upload "IGrants-Cal-v2.csv" output file to the iGrants (USA) Google calendar.')
 print("Don't forget to download the H2020 calendar (calls.ics) from the H2020 website,")
 print('~' * 80)
