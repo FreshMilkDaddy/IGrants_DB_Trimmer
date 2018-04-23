@@ -1,25 +1,14 @@
-# Originally created: 2016.09.01
-# This script removes MOST non-international grants from the grants.gov downloadable
-#   XML database, reformats due dates & currency for easier readability, removes
-#   garbage opps., i.e., the "this is a test, do not apply" opps, adds hyperlinks
-#   to the OppNums for use in the HTML table on the USA grants website, and removes
-#   grants from agencies that either do not agree with KU policy (DOD) or do not usually
-#   offer funding to international applicants (DOT).
-# Updated for GdG v2.0 XML on 2017.01.02
+#!/usr/bin/env python3
+"""This script removes MOST non-international grants from the grants.gov downloadable XML database."""
 
 import datetime
 import fileinput
 import re
 import time
-
 from lxml import etree
 
-__author__ = 'J.M.Sanderson'
-__copyright__ = 'Copyright 2016, J.M.Sanderson - The iGrants Project'
-__email__ = 'j-sanderson@jimu.kumamoto-u.ac.jp'
-__license__ = 'GPL'
 
-# See how much time this shit takes to run. (End @ bottom) #
+# Start timing it.
 start = time.time()
 
 parser = etree.XMLParser(ns_clean=True)
