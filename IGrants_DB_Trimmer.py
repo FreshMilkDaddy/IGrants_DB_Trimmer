@@ -207,5 +207,5 @@ print('This script also formated the date & award ceiling strings for readabilit
 print('               ***     ***** TO USE *****     ***\n')
 print('Place the "IGrants-DB-v2.xml" output file into the appropriate URA_Web folder.')
 print('Upload "IGrants-Cal-v2.csv" output file to the iGrants (USA) Google calendar.')
-print("Don't forget to download the H2020 calendar (calls.ics) from the H2020 website,")
+print("Scrape the H2020 website with parsehub.com, use the output in Grants_Calendar.R.")
 print('~' * 80)
