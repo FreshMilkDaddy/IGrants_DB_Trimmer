@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""This script removes MOST non-international grants from the grants.gov downloadable XML database. """
+"""This script removes MOST non-international grants from the grants.gov downloadable XML database."""
 
 import datetime
 import fileinput
@@ -8,7 +8,7 @@ import time
 from lxml import etree
 
 
-# Start timing it.
+# Start timer
 start = time.time()
 
 parser = etree.XMLParser(ns_clean=True)
@@ -31,10 +31,15 @@ for el in root.findall('{*}OpportunitySynopsisDetail_1_0'):
 # remove all DOD, DOI, VA, DOT, DOS, DOL agency entries
 for el in root.findall('{*}OpportunitySynopsisDetail_1_0'):
     for agency in el.findall('{*}AgencyCode'):
-        if agency.text[:3] == "DOD" or agency.text[:3] == "DOI" or agency.text[:2] == "VA" or agency.text[:3] == "DOT" or agency.text[:3] == "DOS" or agency.text[:3] == "DOL":
+        if agency.text[:3] == "DOD" or 
+        agency.text[:3] == "DOI" or 
+        agency.text[:2] == "VA" or 
+        agency.text[:3] == "DOT" or 
+        agency.text[:3] == "DOS" or 
+        agency.text[:3] == "DOL":
             root.remove(el)
 
-# other possible agencies to remove: GCERC, DOE, USAID, NARA, IMLS
+# other possible agencies to remove: GCERC, DOE, NARA, IMLS
 
 # why doesn't this work like the above?
 #for el in root.findall('.//{*}AgencyCode'):
@@ -207,5 +212,5 @@ print('This script also formated the date & award ceiling strings for readabilit
 print('               ***     ***** TO USE *****     ***\n')
 print('Place the "IGrants-DB-v2.xml" output file into the appropriate URA_Web folder.')
 print('Upload "IGrants-Cal-v2.csv" output file to the iGrants (USA) Google calendar.')
-print("Scrape the H2020 website with parsehub.com, use the output in Grants_Calendar.R.")
+print("Don't forget to download the H2020 calendar (calls.ics) from the H2020 website,")
 print('~' * 80)

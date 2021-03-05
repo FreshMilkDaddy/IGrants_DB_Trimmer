@@ -1,0 +1,5 @@
+/newXMLtags.txt
+*.xsl
+.DS_Store
+.vscode/settings.json
+runtimes.ods
