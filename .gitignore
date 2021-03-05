@@ -65,3 +65,15 @@ Output/
 
 IGrantDBFix_v2\.1\.py
 /IGrants_DB_Trimmer - 20171109-backup.py
+
+# VSCode
+.VSCode
+OLD/IGrants_DB_Trimmer-OLD.py
+.DS_Store
+.vscode/settings.json
+.vscode/.ropeproject/config.py
+.vscode/.ropeproject/objectdb
+Data/.gitignore
+Data/style.xsl
+runtimes.ods
+Data/newXMLtags.txt
